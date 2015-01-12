@@ -36,4 +36,13 @@ public class Response {
     public String getBodyString(Charset charset) {
         return new String(body, charset);
     }
+
+    @Override
+    public String toString() {
+        return "Response{" +
+                "code=" + code +
+                ", body=" + (null == body ? "null" : new String(body)) +
+                ", headers=" + headers +
+                '}';
+    }
 }
