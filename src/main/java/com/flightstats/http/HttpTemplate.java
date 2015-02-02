@@ -109,7 +109,8 @@ public class HttpTemplate {
     }
 
     public Response get(URI uri, Map<String, String> extraHeaders) {
-        return get(uri, res -> {}, extraHeaders);
+        return get(uri, res -> {
+        }, extraHeaders);
     }
 
     private void addExtraHeaders(HttpRequestBase request, Map<String, String> extraHeaders) {
@@ -262,15 +263,14 @@ public class HttpTemplate {
         return post(uri, bytes, contentType, new HashMap<>());
     }
 
-    public Response post(URI uri, byte[] bytes, String contentType, Map<String, String> extraHeaders) {
-        HashMap<String, String> headers = new HashMap<>(extraHeaders);
-        headers.put("Content-Type", contentType);
-        return post(uri, bytes, headers);
+    public Response post(URI uri, byte[] bytes, Map<String, String> extraHeaders) {
+        return post(uri, bytes, defaultContentType, extraHeaders);
     }
 
-    public Response post(URI uri, byte[] bytes, Map<String, String> extraHeaders) {
+
+    public Response post(URI uri, byte[] bytes, String contentType, Map<String, String> extraHeaders) {
         try {
-            return executePost(uri.toString(), extraHeaders.getOrDefault("Content-Type", defaultContentType), new ByteArrayEntity(bytes), extraHeaders);
+            return executePost(uri.toString(), contentType, new ByteArrayEntity(bytes), extraHeaders);
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
