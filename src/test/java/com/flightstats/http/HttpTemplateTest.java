@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+import static java.util.Collections.EMPTY_MAP;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -291,5 +292,35 @@ public class HttpTemplateTest {
         //THEN
         assertEquals(expected, result);
         assertEquals("I'm extra", seenPost.get().getFirstHeader("SOMETHING").getValue());
+    }
+
+    @Test
+    public void testPostNotPassedContentTypeUsesInstanceType() throws Exception {
+        //GIVEN
+        HttpClient client = mock(HttpClient.class);
+        HttpResponse httpResponse = mock(HttpResponse.class);
+        StatusLine statusLine = mock(StatusLine.class);
+        HttpEntity entity = mock(HttpEntity.class);
+
+        when(httpResponse.getStatusLine()).thenReturn(statusLine);
+        when(statusLine.getStatusCode()).thenReturn(200);
+        when(httpResponse.getEntity()).thenReturn(entity);
+        when(entity.getContent()).thenReturn(new ByteArrayInputStream("here ya go".getBytes()));
+        when(httpResponse.getAllHeaders()).thenReturn(new Header[0]);
+
+        AtomicReference<HttpPost> seenPost = new AtomicReference<>();
+        when(client.execute(any(HttpPost.class))).thenAnswer(invocation -> {
+            seenPost.set((HttpPost) invocation.getArguments()[0]);
+            return httpResponse;
+        });
+
+        HttpTemplate testClass = new HttpTemplate(client, null, null, "application/awesome", "*/*");
+
+        //WHEN
+        testClass.post(URI.create("http://flightstats.com/testtesttest"), "hey its content".getBytes(), EMPTY_MAP);
+
+        //THEN
+        assertEquals("application/awesome", seenPost.get().getFirstHeader("content-type").getValue());
+
     }
 }
