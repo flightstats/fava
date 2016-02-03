@@ -16,13 +16,13 @@ public class Response {
     byte[] body;
     Multimap<String, String> headers;
 
-    public String getHeader(String location) {
-        Collection<String> headers = this.headers.get(location);
+    public String getHeader(String headerName) {
+        Collection<String> headers = this.headers.get(headerName);
         return headers == null ? null : Iterables.getFirst(headers, null);
     }
 
-    public Collection<String> getHeaders(String location) {
-        return headers.get(location);
+    public Collection<String> getHeaders(String headerName) {
+        return headers.get(headerName);
     }
 
     /**
