@@ -1,6 +1,10 @@
 Fava
 ====
 
+**NOTE: This project is no longer maintained and we are unlikely to merge PRs or respond to issues.**
+
+
+
 Fava is Flightstats' contribution back to the open source java community. It's a bit of a kitchen sink, but it's a kitchen sink that we find to be generally useful.
 
 General dependencies:
