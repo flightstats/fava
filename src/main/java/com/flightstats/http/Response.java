@@ -27,7 +27,10 @@ public class Response {
 
     /**
      * @return The response body as a String by using the platform's default character set.
+     *
+     * @deprecated use {@link #getBodyString(Charset)} with an explicit Charset value instead.
      */
+    @Deprecated
     public String getBodyString() {
         return getBodyString(Charset.defaultCharset());
     }

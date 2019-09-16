@@ -4,8 +4,6 @@ import com.flightstats.util.Part;
 import com.flightstats.util.UUIDGenerator;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -39,10 +37,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.flightstats.http.HttpException.Details;
+import static com.google.common.base.Charsets.UTF_8;
 import static java.util.stream.Collectors.toList;
 
 public class HttpTemplate {
-    public static final ContentType MULTIPART_MIXED = ContentType.create("multipart/mixed", Charsets.UTF_8);
+    public static final ContentType MULTIPART_MIXED = ContentType.create("multipart/mixed", UTF_8);
     public static final String APPLICATION_JSON = "application/json";
     public static final Logger logger = LoggerFactory.getLogger(HttpTemplate.class);
 
@@ -92,7 +91,7 @@ public class HttpTemplate {
             if (isFailedStatusCode(response.getCode())) {
                 throw new HttpException(new Details(response.getCode(), "Get failed to: " + uri + ". response: " + response));
             }
-            result.set(responseCreator.apply(response.getBodyString()));
+            result.set(responseCreator.apply(response.getBodyString(UTF_8)));
         });
         return result.get();
     }
@@ -192,7 +191,7 @@ public class HttpTemplate {
 
     public int postWithNoResponseCodeValidation(String fullUri, Object bodyToPost, Consumer<Response> responseConsumer) {
         String bodyEntity = convertBodyToString(bodyToPost);
-        Response response = executePost(fullUri, responseConsumer, defaultContentType, new StringEntity(bodyEntity, Charsets.UTF_8));
+        Response response = executePost(fullUri, responseConsumer, defaultContentType, new StringEntity(bodyEntity, UTF_8));
         return response.getCode();
     }
 
@@ -320,7 +319,7 @@ public class HttpTemplate {
 
     public <T> T post(String fullUri, Object bodyToPost, Function<String, T> responseConverter) {
         AtomicReference<T> result = new AtomicReference<>();
-        postWithResponse(fullUri, bodyToPost, (Response response) -> result.set(responseConverter.apply(response.getBodyString())));
+        postWithResponse(fullUri, bodyToPost, (Response response) -> result.set(responseConverter.apply(response.getBodyString(UTF_8))));
         return result.get();
     }
 
@@ -334,7 +333,7 @@ public class HttpTemplate {
     }
 
     public Response put(URI uri, Object body) {
-        return put(uri, convertBodyToString(body).getBytes(Charsets.UTF_8), defaultContentType);
+        return put(uri, convertBodyToString(body).getBytes(UTF_8), defaultContentType);
     }
 
     /**
@@ -342,7 +341,7 @@ public class HttpTemplate {
      */
     public Response postWithResponse(String fullUri, Object bodyToPost, Consumer<Response> responseConsumer) {
         String bodyEntity = convertBodyToString(bodyToPost);
-        Response response = executePost(fullUri, responseConsumer, defaultContentType, new StringEntity(bodyEntity, Charsets.UTF_8));
+        Response response = executePost(fullUri, responseConsumer, defaultContentType, new StringEntity(bodyEntity, UTF_8));
         if (isFailedStatusCode(response.getCode())) {
             throw new HttpException(new Details(response.getCode(), "Post failed to: " + fullUri + ". response: " + response));
         }
